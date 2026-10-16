@@ -1,0 +1,28 @@
+﻿# Java
+*.class
+*.log
+
+# Build y compilacion
+bin/
+out/
+build/
+target/
+.gradle/
+
+# IDE
+.idea/
+*.iml
+.project
+.classpath
+.settings/
+.vscode/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos locales y bases de datos generadas
+.env
+*.db
+*.sqlite
+*.sqlite3
