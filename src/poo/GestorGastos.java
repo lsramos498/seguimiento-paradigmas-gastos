@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class GestorGastos {
 
@@ -19,6 +20,7 @@ public class GestorGastos {
         if (gasto == null) {
             throw new IllegalArgumentException("El gasto no puede ser nulo");
         }
+
         gastos.add(gasto);
     }
 
@@ -57,6 +59,13 @@ public class GestorGastos {
 
     // 5. Filtrar gastos mayores a un monto
     public List<Gasto> filtrarPorMonto(BigDecimal montoMinimo) {
+
+        if (montoMinimo == null || montoMinimo.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException(
+                "El monto minimo debe ser un numero valido no negativo"
+            );
+        }
+
         List<Gasto> resultado = new ArrayList<>();
 
         for (Gasto gasto : gastos) {
@@ -70,9 +79,15 @@ public class GestorGastos {
 
     // 6. Buscar gastos por concepto
     public List<Gasto> buscarPorConcepto(String palabra) {
-        List<Gasto> resultado = new ArrayList<>();
 
-        String busqueda = normalizar(palabra);
+        if (palabra == null || palabra.trim().isEmpty()) {
+            throw new IllegalArgumentException(
+                "La busqueda no puede estar vacia"
+            );
+        }
+
+        List<Gasto> resultado = new ArrayList<>();
+        String busqueda = normalizar(palabra.trim());
 
         for (Gasto gasto : gastos) {
             if (normalizar(gasto.getConcepto()).contains(busqueda)) {
@@ -83,9 +98,11 @@ public class GestorGastos {
         return resultado;
     }
 
+    // Ignorar mayusculas, minusculas y acentos
     private String normalizar(String texto) {
         String limpio = Normalizer.normalize(
-            texto.toLowerCase(), Normalizer.Form.NFD
+            texto.toLowerCase(Locale.ROOT),
+            Normalizer.Form.NFD
         );
 
         return limpio.replaceAll("\\p{M}", "");

@@ -2,6 +2,7 @@
 package poo;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Scanner;
 
@@ -14,7 +15,7 @@ public class MainPOO {
         int opcion = -1;
 
         do {
-            System.out.println("\n===== CONTROL DE GASTOS =====");
+            System.out.println("\n===== CONTROL DE GASTOS POO =====");
             System.out.println("1. Registrar gasto");
             System.out.println("2. Mostrar listado de gastos");
             System.out.println("3. Calcular gasto total");
@@ -34,28 +35,37 @@ public class MainPOO {
                         String concepto = teclado.nextLine();
 
                         System.out.print("Monto: ");
-                        BigDecimal monto = new BigDecimal(teclado.nextLine());
+                        BigDecimal monto = new BigDecimal(
+                            teclado.nextLine().trim()
+                        );
 
                         System.out.println("1. Alimentación");
                         System.out.println("2. Transporte");
                         System.out.println("3. Servicios");
                         System.out.println("4. Entretenimiento");
+                        System.out.println("5. Otros");
                         System.out.print("Seleccione categoria: ");
 
-                        int categoriaElegida = Integer.parseInt(teclado.nextLine());
+                        int numeroCategoria = Integer.parseInt(
+                            teclado.nextLine()
+                        );
+
                         String categoria;
 
-                        switch (categoriaElegida) {
+                        switch (numeroCategoria) {
                             case 1: categoria = "Alimentación"; break;
                             case 2: categoria = "Transporte"; break;
                             case 3: categoria = "Servicios"; break;
                             case 4: categoria = "Entretenimiento"; break;
+                            case 5: categoria = "Otros"; break;
                             default: categoria = "";
                         }
 
-                        Gasto nuevo = new Gasto(concepto, monto, categoria);
-                        gestor.agregarGasto(nuevo);
+                        Gasto nuevo = new Gasto(
+                            concepto, monto, categoria
+                        );
 
+                        gestor.agregarGasto(nuevo);
                         System.out.println("Gasto registrado correctamente.");
                         break;
 
@@ -64,7 +74,8 @@ public class MainPOO {
                         break;
 
                     case 3:
-                        System.out.println("Total: $" + gestor.calcularTotal());
+                        System.out.println("Total: " +
+                            formatoDinero(gestor.calcularTotal()));
                         break;
 
                     case 4:
@@ -74,13 +85,16 @@ public class MainPOO {
                             System.out.println("No hay gastos registrados.");
                         } else {
                             System.out.println("Mayor gasto: " +
-                                mayor.getConcepto() + " - $" + mayor.getMonto());
+                                mayor.getConcepto() + " - " +
+                                formatoDinero(mayor.getMonto()));
                         }
                         break;
 
                     case 5:
                         System.out.print("Mostrar gastos mayores a: ");
-                        BigDecimal minimo = new BigDecimal(teclado.nextLine());
+                        BigDecimal minimo = new BigDecimal(
+                            teclado.nextLine().trim()
+                        );
 
                         mostrarGastos(gestor.filtrarPorMonto(minimo));
                         break;
@@ -100,6 +114,9 @@ public class MainPOO {
                         System.out.println("Opcion no valida.");
                 }
 
+            } catch (NumberFormatException e) {
+                System.out.println("Error: Debes ingresar un numero valido.");
+
             } catch (IllegalArgumentException e) {
                 System.out.println("Error: " + e.getMessage());
             }
@@ -109,6 +126,7 @@ public class MainPOO {
         teclado.close();
     }
 
+    // Mostrar los gastos registrados
     public static void mostrarGastos(List<Gasto> gastos) {
 
         if (gastos.isEmpty()) {
@@ -120,10 +138,17 @@ public class MainPOO {
 
         for (Gasto gasto : gastos) {
             System.out.println(
-                gasto.getConcepto() + " | $" +
-                gasto.getMonto() + " | " +
+                gasto.getConcepto() + " | " +
+                formatoDinero(gasto.getMonto()) + " | " +
                 gasto.getCategoria()
             );
         }
+    }
+
+    // Mostrar dinero con signo $ y dos decimales
+    public static String formatoDinero(BigDecimal monto) {
+        return "$" + monto.setScale(
+            2, RoundingMode.HALF_UP
+        ).toPlainString();
     }
 }
